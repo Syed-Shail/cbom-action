@@ -1,0 +1,31 @@
+name: Test CBOM Action
+on:
+  workflow_dispatch:
+    inputs:
+      repoName:
+        description: "GitHub repository to analyze (owner/repo)"
+        required: true
+        default: "padmalava/cbom-action"
+
+jobs:
+  run-cbom:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout this repository (CBOM Action)
+        uses: actions/checkout@v4
+
+      - name: Build matrix
+        uses: ./build-matrix
+        with:
+          repositoryNameWithOwner: ${{ github.event.inputs.repoName }}
+          analyzeDependencies: true
+
+      - name: Analyze repository
+        uses: ./analyze
+        with:
+          repositoryNameWithOwner: ${{ github.event.inputs.repoName }}
+          language: python
+
+      - name: Generate summary
+        uses: ./workflow-summary
